@@ -18,7 +18,7 @@
   <a href="wiki/Home.md"><b>Full guide</b></a>
 </p>
 
-> Developed in `web/src/modules/wittyvisualizer` in [WittyMediaServer](https://github.com/wittywilla/WittyMediaServer).
+> WittyVisualizer is developed and released here. Issues and pull requests are welcome.
 
 Runs inside [WittyMediaServer](https://github.com/wittywilla/WittyMediaServer)'s audio player and
 [WittyMediaPlayer](../../../../apps/wittymediaplayer), the desktop app, from one set of effect files.
