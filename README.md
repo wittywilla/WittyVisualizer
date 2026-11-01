@@ -1,32 +1,10 @@
-<h1 align="center">WittyVisualizer</h1>
+# WittyVisualizer
 
-<p align="center">
-  <b>Light shows that follow your music.</b><br>
-  Bars, scopes, plasma, tunnels, starfields, feedback and fire, in full screen, on the web and on the desktop.
-</p>
+Light shows that follow your music, full screen: bars, scopes, plasma, tunnels, starfields, feedback and fire. It appears in WittyMediaServer's audio player and in WittyMediaPlayer, and you need it only if you want the pictures.
 
-<p align="center">
-  <a href="LICENSE"><img alt="Licence: Apache-2.0" src="https://img.shields.io/badge/licence-Apache--2.0-blue.svg"></a>
-  <img alt="WebGL 2 and Qt 6" src="https://img.shields.io/badge/runs%20on-WebGL%202%20·%20Qt%206-8b6cff.svg">
-</p>
+## What it does
 
-<p align="center">
-  <a href="#the-effects">The effects</a> ·
-  <a href="#how-its-built">How it's built</a> ·
-  <a href="#safety">Safety</a> ·
-  <a href="#use-it-in-an-app">Use it in an app</a> ·
-  <a href="wiki/Home.md"><b>Full guide</b></a>
-</p>
-
-> WittyVisualizer is developed and released here. Issues and pull requests are welcome.
-
-Runs inside [WittyMediaServer](https://github.com/wittywilla/WittyMediaServer)'s audio player and
-[WittyMediaPlayer](../../../../apps/wittymediaplayer), the desktop app, from one set of effect files.
-
-It's in the spirit of the music visualizers people loved on their desktops around the turn of the century,
-written from scratch for this project. Nothing here comes from any other program's effects, presets, names or code.
-
-## The effects
+It runs entirely on your device, with no work for the server. Nothing loads until you open it, and it's off until someone turns it on.
 
 | Effect | What it is | Motion |
 |---|---|---|
@@ -51,54 +29,13 @@ written from scratch for this project. Nothing here comes from any other program
 Colours move with the beat through eight families. Effects change by a fade, a dissolve, an iris or a sweep.
 Calm mode leaves out the lively ones.
 
-## How it's built
+Effects draw at whatever resolution holds the frame rate, down to a quarter of the pixels, and only then drop to 30 frames a second. The loop stops when the tab is hidden, the canvas is off screen or it's turned off. Where a browser has no WebGL 2, a plain canvas draws instead.
 
-**One set of effects, two hosts.** An effect is one text file: a JSON description in a comment at the top, then
-GLSL. Both hosts read those same files. That was the point of the design, so here's what was weighed:
+Every control is named, and everything works from a keyboard, a remote or a game controller.
 
-| Option | Verdict |
-|---|---|
-| **GLSL files with a small description, compiled by each host** | **Chosen.** A fragment shader is short, runs on the graphics card, and is the one language both WebGL 2 and Qt's QRhi take in. A cheap machine still runs it, and the file is plain text a person can read and write |
-| The picture in JavaScript, with the desktop app showing a web view | Rejected. The desktop app has no browser in it, and adding one for this would cost it more than everything else it does |
-| The picture in C++ compiled to WebAssembly | Rejected. Slower than shaders where it matters, and it's far harder for anyone to write an effect |
-| Native code on each side, written twice | Rejected. They'd drift apart within a month |
+You can add an effect of your own as a data file on your own device, in the web app only. It's treated as untrusted: only a small part of GLSL is allowed, its worst-case cost has to be under a fixed limit, and it's tried in a throwaway graphics context first. It still goes through the flash guard. See [Writing effects](wiki/Writing-effects.md).
 
-The first lines of a shader differ by host (`#version 300 es` in a browser, `#version 440` for Qt's tools), so those
-are added when it's put together: `shaders.ts` at run time for the web, and `qt/CMakeLists.txt` at build time for
-Qt, which bakes each effect for Direct3D, Metal, Vulkan and OpenGL. The uniform block, the helpers
-(`shaders/lib.glsl`) and every other pass (`shaders/passes.glsl`) are shared.
-
-```
-effects/*.glsl, palettes.json    the effects: the one source of truth
-shaders/                         what every effect shares, and the guard and present passes
-analysis.ts   qt/wvanalysis.cpp  listening: FFT, bands, beats  (a shared test file holds them to the same numbers)
-engine.ts     qt/wvengine.cpp    what comes next, colours, frame budget
-safety.ts                        the flash guard's sums, and how to count flashes
-gl.ts         qt/wvrenderer.cpp  drawing, on WebGL 2 and on QRhi
-canvas2d.ts                      a plain canvas, where there's no WebGL 2
-tap.ts        qt/wvtap.h         getting at the sound
-session.ts, Stage.tsx            the web app's loop and interface
-qt/wvwidget.cpp                  the desktop's
-format.ts                        reads effect files; refuses unsafe ones someone adds
-```
-
-**Listening without touching.** In a browser, the safe route is a copy of the sound (`captureStream`): the player keeps
-playing straight to the speakers, and turning the visualizer off leaves no trace. Firefox's version mutes the player and
-Safari has none, so there the player goes through an audio context, only once that context is running and only for a
-stream on the page's own address. That can't be undone until the page closes, though it costs almost nothing. A stream
-from another address hides its sound unless it's asked for differently, which would change how it's fetched, so it
-isn't asked: the picture follows a gentle pattern and says so. Stream addresses can carry the sign-in, so they're
-compared by origin and never stored or logged.
-
-On the desktop the audio thread copies what it hands the device into a lock-free ring. It never waits, so it can't add
-latency, and while the visualizer is off that's one atomic read.
-
-**Cheap by design.** It runs entirely on your device, with no work for the server. Nothing loads until it's opened.
-Effects draw at whatever resolution holds the frame rate, down to a quarter of the pixels, and only then drop to 30
-frames a second, leaving out the most expensive effect. The loop stops when the tab is hidden, the canvas is off screen or it's
-turned off, and the graphics card is told to let go of its memory.
-
-## Safety
+### Safety
 
 Flashing can harm people with photosensitive epilepsy, so:
 
@@ -117,47 +54,82 @@ professional flash analyser.
 The canvas is hidden from screen readers, every control is named, and everything works from a keyboard, a remote or a
 game controller.
 
-## Effects you can write
+Where it's shown in the audio player, and how settings are saved per person, stay with the server.
 
-A person can add an effect as a data file on their own device: see [Writing effects](wiki/Writing-effects.md). It's treated
-as untrusted: only a small part of GLSL is allowed (no directives, no arrays, and only short loops that can be counted up front),
-the worst-case cost has to be under a fixed limit, and it's compiled and tried in a throwaway graphics context before it's used. It
-still goes through the flash guard. For now, only the web app can add them: on the desktop, shaders are baked at build time.
+How to use it is in **Help** inside WittyMediaServer: see the music guide.
 
-## Use it in an app
+## How to get it
 
-```tsx
-import { VisualizerStage, type VisualizerHost } from '@wittywilla/wittyvisualizer'
+An admin adds it from the module store inside WittyMediaServer: **Settings → Modules**, then **Browse the store**, then **Add** beside WittyVisualizer. That needs WittyMediaServer 0.6.0-alpha or later, and it works with nothing older. The range this version fits is in `module.json`: 0.6.0-alpha through 0.6.x.
 
-const host: VisualizerHost = { loadSettings: async () => saved(), saveSettings: (s) => save(s) }
+WittyMediaPlayer builds it in, so there's nothing to add there.
 
-<VisualizerStage host={host} media={() => audioElement} place="panel" onPlace={setPlace} onClose={turnOff} />
-```
+## What it needs
 
-`place` is `panel`, `full` (the whole screen) or `mini` (a thumbnail with no controls). There's one visualizer per page, and it
-moves between places without restarting. Load it with `import()`: its front door pulls in everything. In the server's
-web app, `VisualizerView` in `web/src/audio/visualizer.tsx` does all of this and needs only a media element.
+- A device with WebGL 2 for the full effects. A plain canvas stands in without it.
+- React 18 or newer, which the app provides.
+- For the desktop half: Qt 6, including its GuiPrivate and ShaderTools parts.
 
-For Qt, add `qt/` with `add_subdirectory`, link to `wittyvisualizer`, write the samples you send to the device to a
-`wv::SampleTap`, and show a `wv::VisualizerWidget`. See [Embedding](wiki/Embedding.md).
+## Platforms
 
-## Tests
+It's one browser bundle for every system the server runs on, and it runs on whichever device opens the server. It has been run in a Chromium browser through the real audio player, on a test server on Linux, with its gallery and flash checks. Safari, real phones and real TVs have not been tried.
+
+In a browser, it listens to a copy of the sound where it can. Firefox's copy mutes the player and Safari has none, so there the player goes through an audio context, for a stream on the page's own address only. A stream from another address gets a gentle pattern, and it says so.
+
+The desktop half (`qt/`) runs inside WittyMediaPlayer, which is built for Windows only.
+
+## Building and testing
+
+You need Node.js 22, as CI uses, and Go for the manifest check. In a worktree, first run the copy of `dev-modules.mjs` kept above the repositories (`node D:/projects/dev-modules.mjs` on the development machine). It writes only links that git ignores, so the checkout builds against the repositories beside it.
 
 ```bash
-npm test                                  # analysis, flash guard, file checks, effect order
-node tests/gallery-run.mjs sheet out.png  # a picture of every effect (with a Vite dev server)
-node tests/gallery-run.mjs flash          # a strobe through the real guard
-node tests/player-check.mjs out           # through a real player, on a test server
+npm install
 ```
+
+```bash
+npm run build:bundle
+```
+
+That makes one script and one stylesheet, as a server installs them. To check the manifest:
+
+```bash
+go run github.com/wittywilla/wittymodule/cmd/wittymodule check .
+```
+
+```bash
+npm test
+```
+
+| Command | What it does |
+|---|---|
+| `npm test` | Analysis, flash guard, file checks, effect order |
+| `node tests/gallery-run.mjs sheet out.png` | A picture of every effect, with a Vite dev server |
+| `node tests/gallery-run.mjs flash` | A strobe through the real guard |
+| `node tests/player-check.mjs out` | Through a real player, on a test server |
 
 `wvtests`, built with `-DWITTYVISUALIZER_TESTS=ON`, does the same for Qt, with no window.
 
+An effect is one text file: a JSON description in a comment at the top, then GLSL. Both hosts read those same files, and `qt/CMakeLists.txt` bakes them for Direct3D, Metal, Vulkan and OpenGL at build time.
+
+```
+effects/*.glsl, palettes.json    the effects: the one source of truth
+shaders/                         what every effect shares, and the guard and present passes
+analysis.ts   qt/wvanalysis.cpp  listening: FFT, bands, beats (a shared test file holds them to the same numbers)
+engine.ts     qt/wvengine.cpp    what comes next, colours, frame budget
+safety.ts                        the flash guard's sums, and how to count flashes
+gl.ts         qt/wvrenderer.cpp  drawing, on WebGL 2 and on QRhi
+canvas2d.ts                      a plain canvas, where there's no WebGL 2
+tap.ts        qt/wvtap.h         getting at the sound
+session.ts, Stage.tsx            the web app's loop and interface
+qt/wvwidget.cpp                  the desktop's
+format.ts                        reads effect files; refuses unsafe ones someone adds
+```
+
+To use it in another app, see [Embedding](wiki/Embedding.md) and the rest of [wiki/](wiki/Home.md).
+
 ## Licence
 
-**Apache-2.0**, the same licence as WittyMediaServer. © 2026 WittyWilla and contributors.
-Use, change and share it; if you redistribute it or build on it, keep the [NOTICE](NOTICE)
-attribution, *“WittyVisualizer, developed by WittyWilla”*, in your NOTICE file, documentation or About screen.
-
+Apache-2.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). If you redistribute it or build on it, keep the NOTICE attribution. Everything here was written for this project: nothing comes from any other program's effects, presets, names or code.
 
 ## Legal
 

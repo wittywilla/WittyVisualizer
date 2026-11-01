@@ -47,7 +47,7 @@ if (viz->confirmFirstUse())   // shows the notice the first time
 ```
 
 Pass keys to `viz->handleKey(key)`, and connect `closeRequested` and `fullscreenRequested`. It needs Qt 6.7 or later with
-GuiPrivate, for QRhi, and ShaderTools at build time. `apps/wittymediaplayer` is a complete example: `src/ui/mainwindow.cpp`, `setVisualizer`.
+GuiPrivate, for QRhi, and ShaderTools at build time. WittyMediaPlayer is a complete example: `src/ui/mainwindow.cpp`, `setVisualizer`.
 
 ## On other kinds of app
 
