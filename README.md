@@ -56,7 +56,7 @@ game controller.
 
 Where it's shown in the audio player, and how settings are saved per person, stay with the server.
 
-How to use it is in **Help** inside WittyMediaServer: see the music guide.
+How to use it is in **Help** inside WittyMediaServer: see Music, audiobooks and podcasts.
 
 ## How to get it
 
