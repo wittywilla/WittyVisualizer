@@ -22,6 +22,8 @@ const login = await post('/api/login', { name: process.env.WV_NAME, password: pr
 const token = login.token
 // Starts as someone who has never seen it.
 await fetch(server + '/api/me/ui', { method: 'PUT', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
+// The player has two audio elements that take turns: this is whichever is in use.
+const AUDIO = `[...document.querySelectorAll('audio')].find((a) => a.src)`
 
 const b = await launch({ software: has('--software'), width: 1600, height: 900, tmp: process.env.WV_TMP })
 const results = {}
@@ -29,22 +31,38 @@ try {
   const p = await b.open(server + '/')
   await p.eval(`localStorage.setItem('wms.token', ${JSON.stringify(token)})`)
   if (process.env.WV_THEME) await p.eval(`localStorage.setItem('wms.theme', ${JSON.stringify(process.env.WV_THEME)})`)
-  // Costs nothing until it's opened: note what has loaded so far.
   await p.go(server + '/')
   await p.until(`!!document.querySelector('.card, .sidebar, nav')`, 20000, 'the app')
   const libs = await (await fetch(server + '/api/libraries', { headers: { Authorization: 'Bearer ' + token } })).json()
-  const music = (Array.isArray(libs) ? libs : libs.libraries).find((l) => l.type === 'music')
+  const headers = { Authorization: 'Bearer ' + token }
+  let music = null
+  for (const l of (Array.isArray(libs) ? libs : libs.libraries).filter((x) => x.type === 'music')) {
+    const albums = await (await fetch(`${server}/api/music/albums?library=${l.id}&artist=${encodeURIComponent('Generated Artist')}`, { headers })).json()
+    if (albums.length) { music = l; break }
+  }
   await p.go(`${server}/album/${music.id}?artist=${encodeURIComponent('Generated Artist')}&album=${encodeURIComponent('Generated Album')}`)
   await p.until(`[...document.querySelectorAll('button')].some((b) => /^(Play|Play all)/.test(b.textContent.trim()))`, 20000, 'the album page').catch(async (e) => { writeFileSync(join(out, 'album.png'), await p.shot()); throw e })
-  results.loadedBeforeOpening = await p.eval(`performance.getEntriesByType('resource').some((r) => /wittyvisualizer|Stage/.test(r.name))`)
+  // Costs nothing until it's opened: note what has loaded so far.
+  const loaded = `performance.getEntriesByType('resource').some((r) => /wittyvisualizer|Stage/.test(r.name))`
+  results.loadedBeforeOpening = await p.eval(loaded)
   await p.eval(`[...document.querySelectorAll('button')].find((b) => /^(Play|Play all)/.test(b.textContent.trim())).click()`)
-  await p.until(`!!document.querySelector('audio') && document.querySelector('audio').currentTime > 0.5`, 15000, 'the music to start')
-  results.playingBefore = await p.eval(`({ t: document.querySelector('audio').currentTime, paused: document.querySelector('audio').paused })`)
+  await p.until(`${AUDIO}?.currentTime > 0.5`, 15000, 'the music to start')
+  results.playingBefore = await p.eval(`({ t: ${AUDIO}.currentTime, paused: ${AUDIO}.paused })`)
 
-  // Off until someone turns it on.
-  results.canvasBeforeOn = await p.eval(`!!document.querySelector('.wv-canvas')`)
+  // The full player opens on the player's own styles, and the plugin still isn't needed.
+  await p.eval(`document.querySelector('.ab-expand').click()`)
+  await p.until(`!!document.querySelector('.np')`, 5000, 'the full player')
+  await new Promise((d) => setTimeout(d, 500))
+  results.canvasBeforeChoosing = await p.eval(`!!document.querySelector('.wv-canvas')`)
+  results.loadedWithFullPlayer = await p.eval(loaded)
 
-  await p.eval(`document.querySelector('.ab-viz-btn').click()`)
+  // Effects are chosen from the "More" menu, with the notice before the first one.
+  const menu = async () => {
+    await p.eval(`document.querySelector('[aria-label="More visualizer styles"]').click()`)
+    await p.until(`document.querySelectorAll('.np-style-menu button').length > 2`, 15000, 'the list of effects')
+  }
+  await menu()
+  await p.eval(`[...document.querySelectorAll('.np-style-menu button')].find((b) => b.textContent === 'Skyline').click()`)
   await p.until(`!!document.querySelector('.wv-dialog')`, 15000, 'the notice')
   writeFileSync(join(out, 'notice.png'), await p.shot())
   results.noticeRole = await p.eval(`document.querySelector('.wv-dialog').getAttribute('role')`)
@@ -53,11 +71,10 @@ try {
   await new Promise((d) => setTimeout(d, 1500))
   const stage = `document.querySelector('.wv-stage').dataset`
   results.stage = await p.eval(`({ ...${stage} })`)
-  // Set to full place by the button in the bar.
   const stillPlays = async () => {
-    const a = await p.eval(`document.querySelector('audio').currentTime`)
+    const a = await p.eval(`${AUDIO}.currentTime`)
     await new Promise((d) => setTimeout(d, 1000))
-    const c = await p.eval(`({ t: document.querySelector('audio').currentTime, paused: document.querySelector('audio').paused, muted: document.querySelector('audio').muted, volume: document.querySelector('audio').volume })`)
+    const c = await p.eval(`({ t: ${AUDIO}.currentTime, paused: ${AUDIO}.paused, muted: ${AUDIO}.muted, volume: ${AUDIO}.volume })`)
     return { advanced: Math.round((c.t - a) * 100) / 100, paused: c.paused, muted: c.muted, volume: c.volume }
   }
   results.playbackWhileOn = await stillPlays()
@@ -75,21 +92,24 @@ try {
     unnamed: [...document.querySelectorAll('.wv-stage button, .wv-stage select')].filter((e) => !(e.getAttribute('aria-label') || e.textContent.trim())).length,
   })`)
 
-  const setEffect = (id) => p.eval(`(() => { const s = document.querySelector('.wv-bar select'); const set = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set; set.call(s, ${JSON.stringify(id)}); s.dispatchEvent(new Event('change', { bubbles: true })) })()`)
-  const ids = await p.eval(`[...document.querySelectorAll('.wv-bar select option')].map((o) => o.value)`)
+  // Its own full view, with its own controls, from the same menu.
+  await menu()
+  await p.eval(`[...document.querySelectorAll('.np-style-menu button')].find((b) => /Effect settings/.test(b.textContent)).click()`)
+  await p.until(`!!document.querySelector('.wv-stage.whole')`, 5000, 'the whole screen')
+
+  const setEffect = (id) => p.eval(`(() => { const s = document.querySelector('.wv-stage.whole .wv-bar select'); const set = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set; set.call(s, ${JSON.stringify(id)}); s.dispatchEvent(new Event('change', { bubbles: true })) })()`)
+  const ids = await p.eval(`[...document.querySelectorAll('.wv-stage.whole .wv-bar select option')].map((o) => o.value)`)
   results.effects = ids.length
 
-  // Stay on what's chosen, while pictures are taken.
-  await p.eval(`document.querySelector('[aria-label="Visualizer settings"]').click()`)
+  // Stays on what's chosen by default now, and the settings say so.
+  await p.eval(`document.querySelector('.wv-stage.whole [aria-label="Visualizer settings"]').click()`)
   await p.until(`!!document.querySelector('.wv-dialog.wide')`, 3000, 'the settings')
   writeFileSync(join(out, 'settings.png'), await p.shot())
-  await p.eval(`(() => { const s = document.querySelector('.wv-dialog.wide select'); const set = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set; set.call(s, '0'); s.dispatchEvent(new Event('change', { bubbles: true })) })()`)
+  results.changeEffectSetting = await p.eval(`document.querySelector('.wv-dialog.wide select').value`)
   await p.eval(`[...document.querySelectorAll('.wv-check input')].find((i) => /frame rate/.test(i.parentElement.textContent)).click()`)
   await p.eval(`document.querySelector('[aria-label="Close settings"]').click()`)
   await new Promise((d) => setTimeout(d, 200))
 
-  await p.eval(`document.querySelector('[aria-label="Full screen"]')?.click()`)
-  await p.until(`document.querySelector('.wv-stage.whole')`, 5000, 'full screen')
   await new Promise((d) => setTimeout(d, 3000))
   results.fullScreen = await p.eval(`({ ...${stage}, fullscreen: !!document.fullscreenElement })`)
   results.playbackFull = await stillPlays()
@@ -148,7 +168,7 @@ try {
     await p.eval(`document.querySelector('[aria-label="Next"]').click()`)
     await new Promise((d) => setTimeout(d, 300))
     await p.eval(`document.querySelector('[aria-label="Next"]').click()`)
-    await p.until(`document.querySelector('audio').currentTime > 0.1 && /03|Hostile/.test(document.querySelector('.ab-title')?.textContent || '')`, 8000, 'the hostile track')
+    await p.until(`${AUDIO}.currentTime > 0.1 && /03|Hostile/.test(document.querySelector('.np .ab-title')?.textContent || '')`, 8000, 'the hostile track')
     for (const id of ids) {
       await setEffect(id)
       await new Promise((d) => setTimeout(d, 400))
@@ -167,6 +187,7 @@ try {
 
   // Off is really off.
   await p.key('Escape')
+  await p.until(`!document.querySelector('.wv-stage.whole')`, 3000, 'the whole screen to close')
   await new Promise((d) => setTimeout(d, 400))
   await p.eval(`document.querySelector('.ab-viz-btn').click()`)
   await new Promise((d) => setTimeout(d, 500))

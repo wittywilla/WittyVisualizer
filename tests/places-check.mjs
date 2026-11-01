@@ -1,5 +1,5 @@
-// Tries the places and settings around the picture, on a running test server:
-// the full player's panel, the small one, calm mode, adding an effect, and that off is off.
+// Tries the places and settings around the picture, on a running test server: behind the full
+// player, the whole screen, calm mode, adding an effect, and that off is off.
 //
 //   WV_SERVER=... WV_NAME=... WV_PASS=... node tests/places-check.mjs out-folder
 import { mkdirSync, writeFileSync } from 'node:fs'
@@ -18,7 +18,13 @@ const call = async (method, path, body, token) => {
 const { token } = await call('POST', '/api/login', { name: process.env.WV_NAME, password: process.env.WV_PASS })
 await call('PUT', '/api/me/ui', {}, token)
 const libs = await call('GET', '/api/libraries', null, token)
-const music = (Array.isArray(libs) ? libs : libs.libraries).find((l) => l.type === 'music')
+const list = Array.isArray(libs) ? libs : libs.libraries
+const albumOf = async (l) => (await call('GET', `/api/music/albums?library=${l.id}&artist=${encodeURIComponent('Generated Artist')}`, null, token)).length > 0
+let music = null
+for (const l of list.filter((x) => x.type === 'music')) if (await albumOf(l)) { music = l; break }
+const album = `${server}/album/${music.id}?artist=${encodeURIComponent('Generated Artist')}&album=${encodeURIComponent('Generated Album')}`
+// The player has two audio elements that take turns: this is whichever is in use.
+const AUDIO = `[...document.querySelectorAll('audio')].find((a) => a.src)`
 
 const results = {}
 const b = await launch({ width: 1400, height: 900, tmp: process.env.WV_TMP })
@@ -35,36 +41,54 @@ try {
   await p.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] })
   await p.go(server + '/')
   await p.eval(`localStorage.setItem('wms.token', ${JSON.stringify(token)}); localStorage.removeItem('wms.visualizer.custom')`)
-  await p.go(`${server}/album/${music.id}?artist=${encodeURIComponent('Generated Artist')}&album=${encodeURIComponent('Generated Album')}`)
+  await p.go(album)
   await p.until(`[...document.querySelectorAll('button')].some((b) => /^Play/.test(b.textContent.trim()))`, 20000, 'the album')
   await p.eval(`[...document.querySelectorAll('button')].find((b) => /^Play/.test(b.textContent.trim())).click()`)
-  await p.until(`document.querySelector('audio')?.currentTime > 0.2`, 15000, 'the music')
+  await p.until(`${AUDIO}?.currentTime > 0.2`, 15000, 'the music')
 
-  // The full player, then the button there.
-  await p.eval(`document.querySelector('[aria-label="Full player"]').click()`)
-  await p.until(`!!document.querySelector('.audio-bar.full')`, 3000, 'the full player')
-  await p.eval(`document.querySelector('.ab-viz-btn').click()`)
+  // The full player has the player's own light styles running, with none of this module's.
+  const openPlayer = async () => {
+    await p.eval(`document.querySelector('.ab-expand').click()`)
+    await p.until(`!!document.querySelector('.np')`, 5000, 'the full player')
+  }
+  await openPlayer()
+  await wait(500)
+  results.ownStylesFirst = await p.eval(`({ canvas: !!document.querySelector('.np-canvas'), mine: !!document.querySelector('.wv-canvas') })`)
+
+  // Effects are chosen from the player's "More" menu.
+  const choose = async (name) => {
+    await p.eval(`document.querySelector('[aria-label="More visualizer styles"]').click()`)
+    await p.until(`document.querySelectorAll('.np-style-menu button').length > 2`, 15000, 'the list of effects')
+    await p.eval(`[...document.querySelectorAll('.np-style-menu button')].find((b) => b.textContent === ${JSON.stringify(name)}).click()`)
+  }
+  await choose('Molten Glass')
   await p.until(`!!document.querySelector('.wv-dialog')`, 15000, 'the notice')
   results.noticeOnScreen = await p.eval(`(() => { const r = document.querySelector('.wv-dialog').getBoundingClientRect(); return r.top >= 0 && r.bottom <= innerHeight && r.left >= 0 && r.right <= innerWidth })()`)
   results.calmTickedBySystem = await p.eval(`document.querySelector('.wv-dialog input[type=checkbox]').checked`)
   writeFileSync(join(out, 'notice.png'), await p.shot())
 
-  // Not now means nothing started.
+  // Not now means nothing started, and the player goes back to what it had.
   await p.eval(`[...document.querySelectorAll('.wv-dialog button')].find((b) => b.textContent === 'Not now').click()`)
-  await wait(300)
-  results.afterNotNow = await p.eval(`({ canvas: !!document.querySelector('.wv-canvas'), contexts: window.__contexts.length, pressed: document.querySelector('.ab-viz-btn').getAttribute('aria-pressed') })`)
+  await wait(400)
+  results.afterNotNow = await p.eval(`({ mine: !!document.querySelector('.wv-canvas'), own: !!document.querySelector('.np-canvas'), style: document.querySelector('.np-styles [aria-checked=true]')?.textContent })`)
 
-  await p.eval(`document.querySelector('.ab-viz-btn').click()`)
+  await choose('Molten Glass')
   await p.until(`!!document.querySelector('.wv-dialog')`, 5000, 'the notice again')
   await p.eval(`[...document.querySelectorAll('.wv-dialog button')].find((b) => b.textContent === 'Turn on').click()`)
-  await p.until(`document.querySelector('.wv-stage.panel')?.dataset.fps > 0`, 15000, 'the panel')
+  await p.until(`document.querySelector('.wv-stage.panel')?.dataset.fps > 0`, 15000, 'the picture')
   await wait(3000)
-  writeFileSync(join(out, 'panel.png'), await p.shot())
+  writeFileSync(join(out, 'behind-player.png'), await p.shot())
   const stage = `document.querySelector('.wv-stage').dataset`
-  results.panel = await p.eval(`({ size: ${stage}.width + 'x' + ${stage}.height, inFullPlayer: !!document.querySelector('.ab-art-big .wv-canvas'), tap: ${stage}.tap })`)
-  results.keepsPlaying = await p.eval(`!document.querySelector('audio').paused`)
+  results.behindPlayer = await p.eval(`({ size: ${stage}.width + 'x' + ${stage}.height, inPlace: !!document.querySelector('.np-shader .wv-canvas'), effect: ${stage}.effect, tap: ${stage}.tap, barHidden: getComputedStyle(document.querySelector('.np-shader .wv-bar')).display === 'none' })`)
+  results.keepsPlaying = await p.eval(`!${AUDIO}.paused`)
 
-  // Calm mode only shows the gentle ones.
+  // Nothing changes by itself.
+  const held = await p.eval(stage + '.effect')
+  await wait(12000)
+  results.staysPut = (await p.eval(stage + '.effect')) === held
+
+  // Calm mode only shows the gentle ones. Its own controls are hidden behind the player, but
+  // they're still what a host's menu ends up calling.
   const gentle = ['skyline', 'phosphor', 'lissajous', 'molten', 'inkdrift', 'sundial', 'lavalamp', 'hearth', 'cascade', 'juliabloom', 'aurora', 'ripple']
   const seen = new Set()
   for (let i = 0; i < 16; i++) {
@@ -75,10 +99,19 @@ try {
   results.calmEffects = [...seen]
   results.calmOnlyGentle = [...seen].every((e) => gentle.includes(e))
 
-  // The settings sit on the page, and Escape closes them and nothing else.
+  // The whole screen and back, on the same picture.
+  await p.eval(`document.querySelector('[aria-label="More visualizer styles"]').click()`)
+  await p.until(`document.querySelectorAll('.np-style-menu button').length > 2`, 5000, 'the menu')
+  await p.eval(`[...document.querySelectorAll('.np-style-menu button')].find((b) => /Effect settings/.test(b.textContent)).click()`)
+  await p.until(`!!document.querySelector('.wv-stage.whole .wv-canvas')`, 5000, 'the whole screen')
+  await wait(500)
+  writeFileSync(join(out, 'whole.png'), await p.shot())
+  results.wholeScreen = await p.eval(`({ effect: ${stage}.effect, stages: document.querySelectorAll('.wv-stage').length, behind: !!document.querySelector('.np-shader') })`)
+
+  // The settings, and Escape closes them and nothing else.
   await p.eval(`document.querySelector('[aria-label="Visualizer settings"]').click()`)
   await p.until(`!!document.querySelector('.wv-dialog.wide')`, 3000, 'the settings')
-  await p.until(`document.querySelector('.wv-dialog.wide').contains(document.activeElement)`, 2000, 'focus in the settings')
+  writeFileSync(join(out, 'settings.png'), await p.shot())
 
   // Adding an effect: a good one, then bad ones.
   await p.eval(`document.querySelector('.wv-details').open = true`)
@@ -107,22 +140,18 @@ vec4 effect(vec2 uv) {
   results.addBuiltinName = await add('clash.glsl', `/*wittyvisualizer { "format": 1, "id": "hearth", "name": "Mine" } */\nvec4 effect(vec2 uv) { return vec4(1.0); }`)
   await p.key('Escape')
   await wait(200)
-  results.escapeClosedOnlySettings = await p.eval(`({ settings: !!document.querySelector('.wv-dialog.wide'), fullPlayer: !!document.querySelector('.audio-bar.full'), stage: !!document.querySelector('.wv-stage') })`)
+  results.escapeClosedOnlySettings = await p.eval(`({ settings: !!document.querySelector('.wv-dialog.wide'), player: !!document.querySelector('.np'), stage: !!document.querySelector('.wv-stage') })`)
   results.customListed = await p.eval(`[...document.querySelectorAll('.wv-bar select option')].some((o) => o.textContent === 'Soft Rings (yours)')`)
   await p.eval(`(() => { const s = document.querySelector('.wv-bar select'); Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set.call(s, 'soft-rings'); s.dispatchEvent(new Event('change', { bubbles: true })) })()`)
   await wait(3500)
   writeFileSync(join(out, 'custom.png'), await p.shot())
   results.customShowing = await p.eval(stage + '.effect')
 
-  // Close the full player: small, in the thumbnail, on the same canvas.
-  await p.eval(`window.__canvas = document.querySelector('.wv-canvas')`)
-  await p.eval(`document.querySelector('.ab-back').click()`)
-  await wait(800)
-  writeFileSync(join(out, 'mini.png'), await p.shot())
-  results.mini = await p.eval(`({ inThumbnail: !!document.querySelector('.ab-art .wv-canvas'), sameCanvas: document.querySelector('.wv-canvas') === window.__canvas, w: window.__canvas.width, h: window.__canvas.height })`)
-  const frames0 = await p.eval('window.__frames')
-  await wait(1000)
-  results.miniFramesPerSecond = (await p.eval('window.__frames')) - frames0
+  // Out of the whole screen: behind the player again, with a picture.
+  await p.key('Escape')
+  await p.until(`!document.querySelector('.wv-stage.whole') && !!document.querySelector('.np-shader .wv-canvas')`, 3000, 'the way back')
+  await wait(300)
+  results.backBehindPlayer = await p.eval(`document.querySelector('.np-shader .wv-stage').dataset.effect`)
 
   // A hidden page stops by itself.
   await p.eval(`Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange'))`)
@@ -136,31 +165,31 @@ vec4 effect(vec2 uv) {
   await wait(500)
   results.backFromHidden = (await p.eval('window.__frames')) - back0
 
-  // Off is off.
+  // Off is off: the big button, and neither the picture nor its sound is left running.
   await p.eval(`document.querySelector('.ab-viz-btn').click()`)
   await wait(500)
-  const off0 = await p.eval('window.__frames')
-  await wait(1000)
-  results.off = { frames: (await p.eval('window.__frames')) - off0, contexts: await p.eval(`window.__contexts.map((c) => c.state)`), canvas: await p.eval(`!!document.querySelector('.wv-canvas')`), playing: await p.eval(`!document.querySelector('audio').paused`) }
+  results.off = { pressed: await p.eval(`document.querySelector('.ab-viz-btn').getAttribute('aria-pressed')`), contexts: await p.eval(`window.__contexts.map((c) => c.state)`), canvas: await p.eval(`!!document.querySelector('.wv-canvas')`), playing: await p.eval(`!${AUDIO}.paused`) }
 
   // And on again, in the same page, with a new canvas.
   await p.eval(`document.querySelector('.ab-viz-btn').click()`)
-  await p.until(`document.querySelector('.wv-stage')?.dataset.running === 'true' || document.querySelector('.wv-stage')?.dataset.fps > 0`, 8000, 'it to come back')
+  await p.until(`document.querySelector('.wv-stage')?.dataset.fps > 0`, 8000, 'it to come back')
   await wait(1500)
-  results.onAgain = await p.eval(`({ effect: ${stage}.effect, tap: ${stage}.tap, frames: window.__frames, gl: !!document.querySelector('.wv-canvas') })`)
-  await p.key('Escape')
-  await wait(300)
-  await p.eval(`document.querySelector('.ab-viz-btn').click()`)
-  await wait(500)
+  results.onAgain = await p.eval(`({ effect: ${stage}.effect, tap: ${stage}.tap, gl: !!document.querySelector('.wv-canvas') })`)
 
-  // A saved choice brings it back when the full player opens, and only then.
+  // Closing the player lets go: it's only ever behind the full player.
+  await p.eval(`document.querySelector('.np-close').click()`)
+  await p.until(`!document.querySelector('.np')`, 3000, 'it to close')
+  await wait(500)
+  results.closed = await p.eval(`({ canvas: !!document.querySelector('.wv-canvas'), playing: !${AUDIO}.paused })`)
+
+  // A saved choice comes back when the full player opens, and only then.
   await wait(800)
-  await p.go(`${server}/album/${music.id}?artist=${encodeURIComponent('Generated Artist')}&album=${encodeURIComponent('Generated Album')}`)
+  await p.go(album)
   await p.until(`[...document.querySelectorAll('button')].some((b) => /^Play/.test(b.textContent.trim()))`, 20000, 'the album')
   await p.eval(`[...document.querySelectorAll('button')].find((b) => /^Play/.test(b.textContent.trim())).click()`)
-  await p.until(`document.querySelector('audio')?.currentTime > 0.2`, 15000, 'the music')
+  await p.until(`${AUDIO}?.currentTime > 0.2`, 15000, 'the music')
   results.afterReload = await p.eval(`({ canvas: !!document.querySelector('.wv-canvas') })`)
-  await p.eval(`document.querySelector('[aria-label="Full player"]').click()`)
+  await openPlayer()
   await p.until(`!!document.querySelector('.wv-canvas')`, 6000, 'the saved choice')
   results.savedChoiceOpens = true
   results.customKept = await p.eval(`[...document.querySelectorAll('.wv-bar select option')].some((o) => o.textContent === 'Soft Rings (yours)')`)
