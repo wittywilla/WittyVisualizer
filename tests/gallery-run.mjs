@@ -1,5 +1,5 @@
 // Drives tests/gallery.html in a headless browser. Start a Vite dev server first:
-//   (cd web && npx vite --port 5199)
+//   npx vite --port 5199
 //   node tests/gallery-run.mjs sheet out.png            a contact sheet of every effect
 //   node tests/gallery-run.mjs sheet out.png 480 270 8 skyline,hearth
 //   node tests/gallery-run.mjs speed [--software]       milliseconds per frame, per effect
@@ -11,7 +11,7 @@ import { worstFlashesPerSecond } from '../safety.ts'
 const args = process.argv.slice(2)
 const software = args.includes('--software')
 const [cmd, ...rest] = args.filter((a) => a !== '--software')
-const URL_ = process.env.WV_GALLERY || 'http://localhost:5199/src/modules/wittyvisualizer/tests/gallery.html'
+const URL_ = process.env.WV_GALLERY || 'http://localhost:5199/tests/gallery.html'
 
 const b = await launch({ software, tmp: process.env.WV_TMP, width: 2000, height: 1200 })
 try {
