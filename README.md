@@ -2,6 +2,22 @@
 
 Light shows that follow your music, full screen: bars, scopes, plasma, tunnels, starfields, feedback and fire. It appears in WittyMediaServer's audio player and in WittyMediaPlayer, and you need it only if you want the pictures.
 
+<!-- pictures -->
+
+![A light show behind the music player](docs/images/music-visualizer.webp)
+
+<sub>In WittyMediaServer's full-screen player, with [Collide](https://archive.org/details/SRS08807), Aryll Fae, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).</sub>
+
+![Another effect behind the music player](docs/images/music-visualizer-2.webp)
+
+<sub>Another effect, with [Collide](https://archive.org/details/SRS08807), Aryll Fae, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).</sub>
+
+![A third effect behind the music player](docs/images/music-visualizer-3.webp)
+
+<sub>A third, with [Collide](https://archive.org/details/SRS08807), Aryll Fae, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).</sub>
+
+<!-- /pictures -->
+
 ## What it does
 
 It runs entirely on your device, with no work for the server. Nothing loads until you open it, and it's off until someone turns it on.
