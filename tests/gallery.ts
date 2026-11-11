@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // A page for looking at effects without a server: tests/browser.mjs drives it. Every effect
 // runs from generated music, at a fixed step, so the same input gives the same picture.
 import { Analyzer, FFT_SIZE } from '../analysis.ts'

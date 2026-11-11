@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // What the visualizer decides, with no drawing in it: engine.ts in C++, and the limits from
 // safety.ts. It reads the same effect files for their descriptions.
 #pragma once

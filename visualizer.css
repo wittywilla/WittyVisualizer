@@ -1,3 +1,5 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+/* Copyright (C) 2026 WittyWilla and contributors */
 /* WittyVisualizer. Colours come from the theme, so it's at home in all of them; the
    fallbacks are for a host without one. The picture itself is always on black. */
 .wv-stage { position: relative; display: flex; flex-direction: column; background: #000; color: var(--fg, #eee); overflow: hidden; outline: none; }

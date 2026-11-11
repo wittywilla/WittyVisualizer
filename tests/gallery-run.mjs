@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Drives tests/gallery.html in a headless browser. Start a Vite dev server first:
 //   npx vite --port 5199
 //   node tests/gallery-run.mjs sheet out.png            a contact sheet of every effect

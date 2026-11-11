@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Tries the places and settings around the picture, on a running test server: behind the full
 // player, the whole screen, calm mode, adding an effect, and that off is off.
 //

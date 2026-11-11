@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Listening: analysis.ts in C++. They're kept the same on purpose, and a test holds both to
 // tests/fixtures/analysis-golden.json, so a change to one goes to the other.
 #pragma once

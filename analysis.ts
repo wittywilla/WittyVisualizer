@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Listening: turns the last moment of sound into what effects draw from. Pure sums with
 // no browser in them, so it runs under a test, and qt/wvanalysis.cpp is the same thing in
 // C++ (tests/fixtures/analysis-golden.json keeps the two honest).

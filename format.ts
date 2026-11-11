@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // The effect format: one text file, a JSON description in a comment at the top and GLSL
 // after it. It's valid GLSL as it stands, so any editor colours it, and both hosts read
 // the same files: see the README.

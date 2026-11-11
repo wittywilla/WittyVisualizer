@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Draws effects with QRhi: gl.ts for the desktop. Each effect draws into textures of its own;
 // the guard and present passes turn those into the picture, so nothing reaches the screen
 // without passing the flash guard. It isn't tied to a widget, so a test can run it with no

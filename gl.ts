@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 import { AUDIO_ROWS, SPECTRUM_BINS } from './analysis.ts'
 import type { EffectFile } from './format.ts'
 import { effectFrag, fullscreenVert, guardFrag, presentFrag, quadFrag, quadVert } from './shaders.ts'

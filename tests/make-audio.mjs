@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Writes generated music as a WAV file, for trying the visualizer on a real server:
 //   node tests/make-audio.mjs out.wav [seconds] [bpm] [strobe]
 // "strobe" makes it as hostile as music can be: full-range bursts ten times a second.

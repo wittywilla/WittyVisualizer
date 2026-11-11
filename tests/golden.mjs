@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // What the analyzer says about a known piece of generated music, at fixed points. The web
 // test compares with this file, and so does the desktop app's (qt/tests), so the two copies
 // of the analysis can't drift apart. After a deliberate change: node tests/golden.mjs write

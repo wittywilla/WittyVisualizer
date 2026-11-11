@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // The visualizer as a part of a Qt window: the picture and its controls, with the settings
 // and the notice before first use. session.ts and Stage.tsx for the desktop.
 //

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Checks for the desktop host, with no window. The renderer runs on a real graphics API,
 // drawing into a texture, and pictures are read back, so this is the same code a window uses.
 //

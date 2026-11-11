@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // A small driver for a headless Chromium browser, using nothing beyond Node. No window opens.
 //   const b = await launch({ software: true }); const p = await b.open(url); await p.eval('1+1')
 import { spawn } from 'node:child_process'

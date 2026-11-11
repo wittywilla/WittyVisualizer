@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Where the sound comes from on the desktop. The audio thread copies what it's handing to
 // the device into a ring, and the picture reads the newest of it whenever it draws. There's
 // no lock, and the audio thread never waits, so it can't add latency or a glitch: a slow

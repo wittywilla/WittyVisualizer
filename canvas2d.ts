@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 import { HISTORY_ROWS, SPECTRUM_BINS, WAVE_POINTS } from './analysis.ts'
 import type { EffectFile } from './format.ts'
 import type { DrawInput, Renderer } from './gl.ts'

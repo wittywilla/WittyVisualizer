@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Tries the visualizer through the real audio player of a running test server, in a headless
 // browser, with a library of generated music (tests/make-audio.mjs). Never for a real library.
 //

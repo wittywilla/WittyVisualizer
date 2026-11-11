@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Flashing can harm people with photosensitive epilepsy, so the picture goes through a
 // limiter that no effect can get around. WCAG 2.3.1 calls a change a flash only if it's a
 // pair of opposing swings of at least 10% of the maximum relative luminance (or the

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 import { Analyzer, FFT_SIZE, MIN_BEAT_GAP } from './analysis.ts'
 import { CanvasRenderer } from './canvas2d.ts'
 import { Budget, Cycle, DEFAULT_SETTINGS, Palettes, eligible, normalizeSettings, type Settings } from './engine.ts'

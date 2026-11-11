@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 // Generated music for tests: nothing here comes from a recording.
 
 // A kick on every beat, a bass line, a chord that moves, and hats, with a wide stereo image.

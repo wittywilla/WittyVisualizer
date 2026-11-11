@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-or-later
+// Copyright (C) 2026 WittyWilla and contributors
 import { FFT_SIZE } from './analysis.ts'
 
 // Listening to what's playing, without touching it. This is the part that could hurt
