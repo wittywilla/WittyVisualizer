@@ -5,6 +5,8 @@ What changed in WittyVisualizer, newest first. What changed before it had a repo
 
 ## Unreleased
 
+- **Aurora Rings**, a new gentle effect (Design 2). All seventeen earlier effects are unchanged.
+
 - **Module API 4**, for WittyMediaServer 0.8.0-alpha and later: the module carries its own server-driven UI in `sdui.json`, which `wittymodule pack` puts in every archive.
 - Carries `sdui.json` with its theme scope. It adds no pages: it is shown inside the audio player.
 - **WittyVisualizer 0.3.0:** Fits WittyMediaServer 0.8.x.

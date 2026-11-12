@@ -41,6 +41,7 @@ It runs entirely on your device, with no work for the server. Nothing loads unti
 | **Fractal Bloom** | A Julia fractal steered by the music | gentle |
 | **Northern Veil** | Curtains of light over a starry sky | gentle |
 | **Ripple Tank** | A pool where each beat is a drop | gentle |
+| **Aurora Rings** | Glowing rings that swell with the bass | gentle |
 
 Colours move with the beat through eight families. Effects change by a fade, a dissolve, an iris or a sweep.
 Calm mode leaves out the lively ones.
