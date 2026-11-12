@@ -2,6 +2,251 @@
   "format": "wittymodule-sdui",
   "formatVersion": 1,
   "module": "wittyvisualizer",
-  "catalog": 2,
-  "theme": { "scope": "wittyvisualizer", "label": "Visualizer" }
+  "catalog": 7,
+  "theme": {
+    "scope": "wittyvisualizer",
+    "label": "Visualizer"
+  },
+  "settings": [
+    {
+      "id": "wittyvisualizer",
+      "title": "Visualizer",
+      "icon": "music",
+      "groups": [
+        {
+          "title": "Effect",
+          "rows": [
+            {
+              "key": "effect",
+              "kind": "enum",
+              "scope": "profile",
+              "label": "Effect",
+              "default": "skyline",
+              "options": [
+                {
+                  "value": "skyline",
+                  "label": "Skyline"
+                },
+                {
+                  "value": "phosphor",
+                  "label": "Phosphor Trace"
+                },
+                {
+                  "value": "lissajous",
+                  "label": "Lantern Knots"
+                },
+                {
+                  "value": "molten",
+                  "label": "Molten Glass"
+                },
+                {
+                  "value": "wormhole",
+                  "label": "Wormhole"
+                },
+                {
+                  "value": "warpstars",
+                  "label": "Warp Field"
+                },
+                {
+                  "value": "inkdrift",
+                  "label": "Ink Drift"
+                },
+                {
+                  "value": "prism",
+                  "label": "Prism Wheel"
+                },
+                {
+                  "value": "embers",
+                  "label": "Ember Fountain"
+                },
+                {
+                  "value": "sundial",
+                  "label": "Sun Dial"
+                },
+                {
+                  "value": "lavalamp",
+                  "label": "Lava Lamp"
+                },
+                {
+                  "value": "hearth",
+                  "label": "Hearth"
+                },
+                {
+                  "value": "horizon",
+                  "label": "Horizon Run"
+                },
+                {
+                  "value": "cascade",
+                  "label": "Cascade"
+                },
+                {
+                  "value": "juliabloom",
+                  "label": "Fractal Bloom"
+                },
+                {
+                  "value": "aurora",
+                  "label": "Northern Veil"
+                },
+                {
+                  "value": "ripple",
+                  "label": "Ripple Tank"
+                },
+                {
+                  "value": "rings",
+                  "label": "Aurora Rings"
+                }
+              ]
+            },
+            {
+              "key": "random",
+              "kind": "bool",
+              "scope": "profile",
+              "label": "Pick effects at random",
+              "help": "Off: the effect above stays until you change it.",
+              "default": true
+            },
+            {
+              "key": "cycleSec",
+              "kind": "enum",
+              "scope": "profile",
+              "label": "Auto-change",
+              "default": "0",
+              "options": [
+                {
+                  "value": "0",
+                  "label": "Off"
+                },
+                {
+                  "value": "10",
+                  "label": "Every 10 s"
+                },
+                {
+                  "value": "15",
+                  "label": "Every 15 s"
+                },
+                {
+                  "value": "30",
+                  "label": "Every 30 s"
+                },
+                {
+                  "value": "60",
+                  "label": "Every minute"
+                },
+                {
+                  "value": "120",
+                  "label": "Every 2 minutes"
+                },
+                {
+                  "value": "300",
+                  "label": "Every 5 minutes"
+                }
+              ]
+            },
+            {
+              "key": "favouritesOnly",
+              "kind": "bool",
+              "scope": "profile",
+              "label": "Only my favourites",
+              "help": "Favourites are chosen with the heart in the visualizer.",
+              "default": false
+            }
+          ]
+        },
+        {
+          "title": "Calm mode and flashing",
+          "footer": "Calm mode follows the device's Reduce motion setting unless you choose here.",
+          "rows": [
+            {
+              "kind": "info",
+              "label": "This effect may flash",
+              "help": "Some effects flash or move quickly. Calm mode leaves out the lively ones and keeps everything else."
+            },
+            {
+              "key": "calm",
+              "kind": "enum",
+              "scope": "profile",
+              "label": "Calm mode",
+              "default": "system",
+              "options": [
+                {
+                  "value": "system",
+                  "label": "As the device says"
+                },
+                {
+                  "value": "on",
+                  "label": "On"
+                },
+                {
+                  "value": "off",
+                  "label": "Off"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "Effect settings",
+          "rows": [
+            {
+              "key": "intensityPct",
+              "kind": "int",
+              "scope": "profile",
+              "label": "Intensity",
+              "default": 100,
+              "min": 30,
+              "max": 150,
+              "unit": "%"
+            },
+            {
+              "key": "sensitivityPct",
+              "kind": "int",
+              "scope": "profile",
+              "label": "Sensitivity to the music",
+              "default": 100,
+              "min": 25,
+              "max": 200,
+              "unit": "%"
+            },
+            {
+              "key": "scale",
+              "kind": "enum",
+              "scope": "profile",
+              "label": "Quality",
+              "help": "Lower draws fewer pixels, for a slow graphics card.",
+              "default": "0",
+              "options": [
+                {
+                  "value": "0",
+                  "label": "Adapts by itself"
+                },
+                {
+                  "value": "1",
+                  "label": "Full"
+                },
+                {
+                  "value": "0.75",
+                  "label": "Three quarters"
+                },
+                {
+                  "value": "0.5",
+                  "label": "Half"
+                },
+                {
+                  "value": "0.33",
+                  "label": "A third"
+                }
+              ]
+            },
+            {
+              "key": "stats",
+              "kind": "bool",
+              "scope": "profile",
+              "label": "Show the frame rate",
+              "default": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
 }

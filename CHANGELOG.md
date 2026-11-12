@@ -5,6 +5,7 @@ What changed in WittyVisualizer, newest first. What changed before it had a repo
 
 ## Unreleased
 
+- **Settings in every app's Settings, under Modules** (`sdui.json`, each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode, with the flashing notice; intensity, sensitivity, quality and the frame rate. The visualizer reads what those rows save (`normalizeSettings` takes their strings and percentages) and `moduleSettingValues` gives an app what to save when a choice is made in the visualizer itself.
 - **Aurora Rings**, a new gentle effect (Design 2). All seventeen earlier effects are unchanged.
 
 - **Module API 4**, for WittyMediaServer 0.8.0-alpha and later: the module carries its own server-driven UI in `sdui.json`, which `wittymodule pack` puts in every archive.

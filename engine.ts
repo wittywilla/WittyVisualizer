@@ -45,23 +45,38 @@ export const SCALE_CHOICES = [0, 1, 0.75, 0.5, 0.33]
 
 const inRange = (v: unknown, lo: number, hi: number, fallback: number) => (typeof v === 'number' && Number.isFinite(v) ? Math.min(hi, Math.max(lo, v)) : fallback)
 
-// Settings come back from a server and from storage, so they're read with care.
+// Settings come back from a server and from storage, so they're read with care. The same
+// fields arrive from the module's settings (sdui.json, drawn in every app's Settings), whose
+// choices are strings and whose amounts are percentages; both forms are read.
+const num = (v: unknown) => (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v)) ? Number(v) : v)
 export function normalizeSettings(v: unknown): Settings {
   const s = (typeof v === 'object' && v !== null ? v : {}) as Record<string, unknown>
   const d = DEFAULT_SETTINGS
+  const pct = (k: string) => (typeof s[k] === 'number' ? (s[k] as number) / 100 : undefined)
+  const calm = s.calm === 'on' ? true : s.calm === 'off' ? false : s.calm
   return {
     notice: s.notice === true,
     on: s.on === true,
     effect: typeof s.effect === 'string' && s.effect.length <= 40 ? s.effect : d.effect,
     random: typeof s.random === 'boolean' ? s.random : d.random,
-    cycleSec: CYCLE_CHOICES.includes(s.cycleSec as number) ? (s.cycleSec as number) : d.cycleSec,
+    cycleSec: CYCLE_CHOICES.includes(num(s.cycleSec) as number) ? (num(s.cycleSec) as number) : d.cycleSec,
     favourites: Array.isArray(s.favourites) ? s.favourites.filter((f) => typeof f === 'string' && f.length <= 40).slice(0, 64) : [],
     favouritesOnly: s.favouritesOnly === true,
-    intensity: inRange(s.intensity, 0.3, 1.5, d.intensity),
-    sensitivity: inRange(s.sensitivity, 0.25, 2, d.sensitivity),
-    calm: typeof s.calm === 'boolean' ? s.calm : null,
-    scale: SCALE_CHOICES.includes(s.scale as number) ? (s.scale as number) : d.scale,
+    intensity: inRange(pct('intensityPct') ?? s.intensity, 0.3, 1.5, d.intensity),
+    sensitivity: inRange(pct('sensitivityPct') ?? s.sensitivity, 0.25, 2, d.sensitivity),
+    calm: typeof calm === 'boolean' ? calm : null,
+    scale: SCALE_CHOICES.includes(num(s.scale) as number) ? (num(s.scale) as number) : d.scale,
     stats: s.stats === true,
+  }
+}
+
+// The fields of the module's settings, in the form its settings rows hold them: what an app
+// saves through the module settings route when a choice is made in the visualizer itself.
+export function moduleSettingValues(s: Settings): Record<string, unknown> {
+  return {
+    effect: s.effect ?? 'skyline', random: s.random, cycleSec: String(s.cycleSec), favouritesOnly: s.favouritesOnly,
+    calm: s.calm === null ? 'system' : s.calm ? 'on' : 'off', intensityPct: Math.round(s.intensity * 100),
+    sensitivityPct: Math.round(s.sensitivity * 100), scale: String(s.scale), stats: s.stats,
   }
 }
 

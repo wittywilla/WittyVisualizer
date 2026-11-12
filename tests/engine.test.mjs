@@ -106,7 +106,7 @@ test('a chosen resolution stays, and a long pause is not taken for slowness', ()
 test('settings from anywhere are made safe', () => {
   assert.deepEqual(normalizeSettings(null), DEFAULT_SETTINGS)
   assert.deepEqual(normalizeSettings('x'), DEFAULT_SETTINGS)
-  const s = normalizeSettings({ notice: 'yes', on: 1, effect: 'x'.repeat(99), random: 'no', cycleSec: 7, favourites: ['a', 3, {}, 'b'], intensity: 90, sensitivity: -4, calm: 'on', scale: 0.2, stats: true })
+  const s = normalizeSettings({ notice: 'yes', on: 1, effect: 'x'.repeat(99), random: 'no', cycleSec: 7, favourites: ['a', 3, {}, 'b'], intensity: 90, sensitivity: -4, calm: 'maybe', scale: 0.2, stats: true })
   assert.equal(s.notice, false, 'only true counts as having read the notice')
   assert.equal(s.on, false)
   assert.equal(s.effect, null)
@@ -135,4 +135,13 @@ test('colours move with the beats, slowly, and stay in range', () => {
   assert.ok(Math.abs(first - start) < 0.01, 'a change begins gently')
   for (let i = 0; i < 300; i++) p.step(1 / 60, 24, false)
   assert.notEqual(p.out.a[0], start)
+})
+
+test('the module settings form is read, and written back in that form', async () => {
+  const { moduleSettingValues } = await import('../engine.ts')
+  const s = normalizeSettings({ effect: 'rings', random: false, cycleSec: '30', calm: 'on', intensityPct: 120, sensitivityPct: 50, scale: '0.5', stats: true, favourites: ['rings'] })
+  assert.deepEqual([s.effect, s.random, s.cycleSec, s.calm, s.intensity, s.sensitivity, s.scale, s.stats], ['rings', false, 30, true, 1.2, 0.5, 0.5, true])
+  assert.equal(normalizeSettings({ calm: 'system' }).calm, null)
+  assert.deepEqual(moduleSettingValues(s), { effect: 'rings', random: false, cycleSec: '30', favouritesOnly: false, calm: 'on', intensityPct: 120, sensitivityPct: 50, scale: '0.5', stats: true })
+  assert.deepEqual(normalizeSettings({ ...s, ...moduleSettingValues(s) }), s)
 })
