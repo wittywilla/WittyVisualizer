@@ -148,6 +148,15 @@ To use it in another app, see [Embedding](wiki/Embedding.md) and the rest of [wi
 
 GNU Affero General Public License v3.0 (or later): see [LICENSE](LICENSE) and [NOTICE](NOTICE). If you redistribute it or build on it, please keep the NOTICE attribution. Everything here was written for this project: nothing comes from any other program's effects, presets, names or code.
 
+
+## In every app: its server-driven UI
+
+It carries its own `sdui.json`: its theme scope, and **Settings, Visualizer** (each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode with the flashing notice; intensity, sensitivity, quality and the frame rate. The effects picker's presets are the server's `music.visualizer.presets`, the same 18 effects as `effects/`.
+
+**Stays in WittyVisualizer's own code:** the visualizer renderer itself, drawn over the music views of every look.
+
+The file is checked with `wittymodule check` and described in WittyMediaServer's [docs/SDUI-MODULES.md](https://github.com/wittywilla/WittyMediaServer/blob/master/docs/SDUI-MODULES.md).
+
 ## Legal
 
 WittyVisualizer is an independent open-source project. It isn't associated with, sponsored by or
