@@ -33,11 +33,13 @@ export type Settings = {
   calm: boolean | null // null follows the system's reduced motion setting
   scale: number // 0 adapts by itself; otherwise the share of full resolution
   stats: boolean
+  speed: number // 0.5 to 2: how fast the effects move
+  colour: 'effect' | 'theme' // the effects' own colour families, or the theme's accent
 }
 
 export const DEFAULT_SETTINGS: Settings = {
   notice: false, on: false, effect: null, random: true, cycleSec: 0, favourites: [], favouritesOnly: false,
-  intensity: 1, sensitivity: 1, calm: null, scale: 0, stats: false,
+  intensity: 1, sensitivity: 1, calm: null, scale: 0, stats: false, speed: 1, colour: 'effect',
 }
 
 export const CYCLE_CHOICES = [0, 10, 15, 30, 60, 120, 300]
@@ -67,6 +69,8 @@ export function normalizeSettings(v: unknown): Settings {
     calm: typeof calm === 'boolean' ? calm : null,
     scale: SCALE_CHOICES.includes(num(s.scale) as number) ? (num(s.scale) as number) : d.scale,
     stats: s.stats === true,
+    speed: inRange(pct('speedPct') ?? s.speed, 0.5, 2, d.speed),
+    colour: s.colour === 'theme' ? 'theme' : 'effect',
   }
 }
 
@@ -77,6 +81,7 @@ export function moduleSettingValues(s: Settings): Record<string, unknown> {
     effect: s.effect ?? 'skyline', random: s.random, cycleSec: String(s.cycleSec), favouritesOnly: s.favouritesOnly,
     calm: s.calm === null ? 'system' : s.calm ? 'on' : 'off', intensityPct: Math.round(s.intensity * 100),
     sensitivityPct: Math.round(s.sensitivity * 100), scale: String(s.scale), stats: s.stats,
+    speedPct: Math.round(s.speed * 100), colour: s.colour,
   }
 }
 
@@ -209,6 +214,16 @@ export class Budget {
 }
 
 export type PaletteDef = { id: string; a: number[]; b: number[]; c: number[]; d: number[] }
+
+// A colour family made from one colour (the theme's accent, as #rrggbb): the accent at its middle,
+// swinging a little lighter and darker with the music, with a slight shift of hue so the effects
+// keep their depth. null for anything that isn't a colour.
+export function accentPalette(hex: string): PaletteDef | null {
+  const m = /^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex.trim())
+  if (!m) return null
+  const rgb = [m[1], m[2], m[3]].map((h) => parseInt(h, 16) / 255)
+  return { id: 'theme', a: rgb.map((v) => 0.1 + 0.5 * v), b: rgb.map((v) => 0.08 + 0.3 * v), c: [1, 1, 1], d: [0, 0.06, 0.12] }
+}
 
 // Moves between colour families with the music: a new one every so many beats, or after a
 // while without any, always as a slow blend. Calm mode moves less often.

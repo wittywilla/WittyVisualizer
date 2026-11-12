@@ -198,6 +198,34 @@
               "unit": "%"
             },
             {
+              "key": "speedPct",
+              "kind": "int",
+              "scope": "profile",
+              "label": "Speed",
+              "help": "How fast the effects move.",
+              "default": 100,
+              "min": 50,
+              "max": 200,
+              "unit": "%"
+            },
+            {
+              "key": "colour",
+              "kind": "enum",
+              "scope": "profile",
+              "label": "Colour",
+              "default": "effect",
+              "options": [
+                {
+                  "value": "effect",
+                  "label": "The effect's own colours"
+                },
+                {
+                  "value": "theme",
+                  "label": "The theme's accent"
+                }
+              ]
+            },
+            {
               "key": "sensitivityPct",
               "kind": "int",
               "scope": "profile",

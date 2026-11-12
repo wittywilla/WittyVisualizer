@@ -151,7 +151,7 @@ GNU Affero General Public License v3.0 (or later): see [LICENSE](LICENSE) and [N
 
 ## In every app: its server-driven UI
 
-It carries its own `sdui.json`: its theme scope, and **Settings, Visualizer** (each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode with the flashing notice; intensity, sensitivity, quality and the frame rate. The effects picker's presets are the server's `music.visualizer.presets`, the same 18 effects as `effects/`.
+It carries its own `sdui.json`: its theme scope, and **Settings, Visualizer** (each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode with the flashing notice; intensity, speed, colour (the effect's own families or the theme's accent), sensitivity, quality and the frame rate. Every effect takes speed and colour. The effects picker's presets are the server's `music.visualizer.presets`, the same 18 effects as `effects/`.
 
 **Stays in WittyVisualizer's own code:** the visualizer renderer itself, drawn over the music views of every look.
 

@@ -2,7 +2,20 @@
 // Copyright (C) 2026 WittyWilla and contributors
 import { Analyzer, FFT_SIZE, MIN_BEAT_GAP } from './analysis.ts'
 import { CanvasRenderer } from './canvas2d.ts'
-import { Budget, Cycle, DEFAULT_SETTINGS, Palettes, eligible, normalizeSettings, type Settings } from './engine.ts'
+import { Budget, Cycle, DEFAULT_SETTINGS, Palettes, accentPalette, eligible, normalizeSettings, type PaletteDef, type Settings } from './engine.ts'
+
+// The page's theme accent, read from its colour tokens, for "colour: theme". A window with no
+// such token (the desktop player) keeps the effects' own colours. Read at most every two seconds.
+let accentAt = 0
+let accentKept: PaletteDef | null = null
+function themeAccent(): PaletteDef | null {
+  const now = performance.now()
+  if (now - accentAt > 2000) {
+    accentAt = now
+    try { accentKept = accentPalette(getComputedStyle(document.documentElement).getPropertyValue('--accent')) } catch { accentKept = null }
+  }
+  return accentKept
+}
 import { parseEffect, type EffectFile } from './format.ts'
 import { GlRenderer, createGl, trialCompile, type Renderer } from './gl.ts'
 import { GUARD, GUARD_CALM } from './safety.ts'
@@ -402,9 +415,11 @@ export class Session {
     this.analyzer.process(this.left, this.right, tap.rate(), dt)
     const a = this.analyzer.frame
     const calm = this.calm, intensity = this.settings.intensity
-    this.time += dt * (calm ? 0.6 : 1)
-    this.flow += dt * (0.3 + 0.75 * a.level * intensity + 0.5 * a.beat) * (calm ? 0.45 : 1)
+    const speed = this.settings.speed
+    this.time += dt * (calm ? 0.6 : 1) * speed
+    this.flow += dt * (0.3 + 0.75 * a.level * intensity + 0.5 * a.beat) * (calm ? 0.45 : 1) * speed
     this.palettes.step(dt, a.beatCount, calm)
+    const accent = this.settings.colour === 'theme' ? themeAccent() : null
 
     // Time for the next one?
     this.shownFor += dt
@@ -424,7 +439,7 @@ export class Session {
     }
     r.draw({
       audio: a, time: this.time, flow: this.flow, dt, intensity, calm,
-      palette: this.palettes.out,
+      palette: accent ?? this.palettes.out,
       guard: calm ? GUARD_CALM : GUARD,
       a: this.fromId, b: incoming, mix: this.mix * this.mix * (3 - 2 * this.mix), mixStyle: this.mixStyle,
     })

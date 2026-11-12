@@ -139,9 +139,19 @@ test('colours move with the beats, slowly, and stay in range', () => {
 
 test('the module settings form is read, and written back in that form', async () => {
   const { moduleSettingValues } = await import('../engine.ts')
-  const s = normalizeSettings({ effect: 'rings', random: false, cycleSec: '30', calm: 'on', intensityPct: 120, sensitivityPct: 50, scale: '0.5', stats: true, favourites: ['rings'] })
+  const s = normalizeSettings({ effect: 'rings', random: false, cycleSec: '30', calm: 'on', intensityPct: 120, sensitivityPct: 50, scale: '0.5', stats: true, favourites: ['rings'], speedPct: 150, colour: 'theme' })
   assert.deepEqual([s.effect, s.random, s.cycleSec, s.calm, s.intensity, s.sensitivity, s.scale, s.stats], ['rings', false, 30, true, 1.2, 0.5, 0.5, true])
   assert.equal(normalizeSettings({ calm: 'system' }).calm, null)
-  assert.deepEqual(moduleSettingValues(s), { effect: 'rings', random: false, cycleSec: '30', favouritesOnly: false, calm: 'on', intensityPct: 120, sensitivityPct: 50, scale: '0.5', stats: true })
+  assert.deepEqual([s.speed, s.colour], [1.5, 'theme'])
+  assert.deepEqual(moduleSettingValues(s), { effect: 'rings', random: false, cycleSec: '30', favouritesOnly: false, calm: 'on', intensityPct: 120, sensitivityPct: 50, scale: '0.5', stats: true, speedPct: 150, colour: 'theme' })
+  assert.deepEqual([normalizeSettings({ speed: 9 }).speed, normalizeSettings({ colour: 'album' }).colour], [2, 'effect'])
   assert.deepEqual(normalizeSettings({ ...s, ...moduleSettingValues(s) }), s)
+})
+
+test('the theme accent makes a colour family of its own', async () => {
+  const { accentPalette } = await import('../engine.ts')
+  const p = accentPalette('#7955ff')
+  assert.ok(p && p.a.every((v, i) => v > 0 && v < 1 && v + p.b[i] <= 1.01), 'stays within the screen\'s colours')
+  assert.ok(p.a[2] > p.a[1], 'keeps the accent\'s hue')
+  assert.equal(accentPalette('not a colour'), null)
 })

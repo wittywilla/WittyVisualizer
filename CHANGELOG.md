@@ -5,6 +5,7 @@ What changed in WittyVisualizer, newest first. What changed before it had a repo
 
 ## Unreleased
 
+- **Speed and colour.** A speed for how fast the effects move (50% to 200%), and a colour choice: each effect's own colour families, as before, or the theme's accent. Every effect takes both. In Settings, Modules and saved with the rest.
 - **Settings in every app's Settings, under Modules** (`sdui.json`, each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode, with the flashing notice; intensity, sensitivity, quality and the frame rate. The visualizer reads what those rows save (`normalizeSettings` takes their strings and percentages) and `moduleSettingValues` gives an app what to save when a choice is made in the visualizer itself.
 - **Aurora Rings**, a new gentle effect (Design 2). All seventeen earlier effects are unchanged.
 
