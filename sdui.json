@@ -1,0 +1,7 @@
+{
+  "format": "wittymodule-sdui",
+  "formatVersion": 1,
+  "module": "wittyvisualizer",
+  "catalog": 2,
+  "theme": { "scope": "wittyvisualizer", "label": "Visualizer" }
+}
