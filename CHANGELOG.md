@@ -5,6 +5,8 @@ What changed in WittyVisualizer, newest first. What changed before it had a repo
 
 ## Unreleased
 
+- **WittyVisualizer 0.3.0:** Fits WittyMediaServer 0.8.x.
+
 - **WittyVisualizer 0.2.1:** A clean install now brings react-dom, which the bundle needs. 0.2.0 was tagged and never released.
 
 - Module API 3 and WittyMediaServer 0.6.0-alpha: this is how a server gets it now, with no copy compiled in.

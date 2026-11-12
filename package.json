@@ -1,6 +1,6 @@
 {
   "name": "@wittywilla/wittyvisualizer",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Music visualizations from shaders, shared by a web app and a desktop app, with a flash limiter no effect can get around.",
   "license": "AGPL-3.0-or-later",
   "author": "WittyWilla (https://github.com/wittywilla)",
