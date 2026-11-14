@@ -1,0 +1,9 @@
+{
+  "format": "wittymodule-integration",
+  "formatVersion": 1,
+  "module": "wittyvisualizer",
+  "host": {
+    "web": ">=5",
+    "sdui": ">=8"
+  }
+}

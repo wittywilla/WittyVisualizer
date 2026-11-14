@@ -107,7 +107,7 @@ npm install
 npm run build:bundle
 ```
 
-That makes one script and one stylesheet, as a server installs them. To check the manifest:
+That builds with WittyModule's one web builder (`kit/web/build-bundle.mjs`, from a WittyModule checkout beside this one, or `WITTYMODULE=<checkout>`), and makes one script and one stylesheet, as a server installs them. To check the manifest:
 
 ```bash
 go run github.com/wittywilla/wittymodule/cmd/wittymodule check .
@@ -149,9 +149,13 @@ To use it in another app, see [Embedding](wiki/Embedding.md) and the rest of [wi
 GNU Affero General Public License v3.0 (or later): see [LICENSE](LICENSE) and [NOTICE](NOTICE). If you redistribute it or build on it, please keep the NOTICE attribution. Everything here was written for this project: nothing comes from any other program's effects, presets, names or code.
 
 
+## Module API 5
+
+WittyVisualizer 0.4.0 is built for module API 5 and carries `integration.json`. It asks for web host API 5 and SDUI catalogue revision 8, and claims no routes, Settings sections or other hooks: WittyModule 0.5.2 has no hook for the audio player's visualizer place, so the server draws the bundle's `VisualizerStage` and `currentSession` there. Its `register(host)` export returns nothing yet. It has no service and keeps no data: each person's choices are its settings, saved by the server.
+
 ## In every app: its server-driven UI
 
-It carries its own `sdui.json`: its theme scope, and **Settings, Visualizer** (each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode with the flashing notice; intensity, speed, colour (the effect's own families or the theme's accent), sensitivity, quality and the frame rate. Every effect takes speed and colour. The effects picker's presets are the server's `music.visualizer.presets`, the same 18 effects as `effects/`.
+It carries its own `sdui.json`: its theme scope, and **Settings, Visualizer** (each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode with the flashing notice; intensity, speed, colour (the effect's own families or the theme's accent), sensitivity, quality and the frame rate. Every effect takes speed and colour. The effect row's choices are the list of effects every app shows, the same 18 as `effects/`: the server's catalogue no longer has a copy (`music.visualizer` lost its presets and controls at module API 5), so an app reads them from this page, `GET /api/sdui/modules/wittyvisualizer/settings`.
 
 **Stays in WittyVisualizer's own code:** the visualizer renderer itself, drawn over the music views of every look.
 
@@ -170,7 +174,7 @@ warranty; see [LICENSE](LICENSE). Local law applies to how you use it. This isn'
 
 A version tag builds the bundle for the browser, signs the checksum list, and publishes a release that servers can install.
 
-Versions move in small steps as work lands. `go run github.com/wittywilla/wittymodule/cmd/wittymodule@v0.4.0 bump .` raises it
+Versions move in small steps as work lands. `go run github.com/wittywilla/wittymodule/cmd/wittymodule@v0.5.2 bump .` raises it
 everywhere it is written (add `-part minor` for a bigger step). A bump isn't a release: nothing is
 tagged or published until you tag it. CI fails when code changed since the last tag and the version
 didn't, because tags never move.

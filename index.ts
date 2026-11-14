@@ -18,6 +18,14 @@
 
 // WittyVisualizer: music visualizations made of shaders that the web app and the desktop
 // app both run. An app gives it a VisualizerHost and a media element; see the README.
+//
+// Module API 5: register(host) is the web host API 5 entry. It claims nothing yet: WittyModule
+// 0.5.2 has no hook for the audio player's visualizer place, so the server draws the named
+// exports below (VisualizerStage, currentSession) there, as it did. The effects every app lists
+// are this module's settings page (sdui.json), no longer the server's catalogue.
+export function register(_host: unknown): Record<string, never> {
+  return {}
+}
 export { VisualizerStage, currentSession, type StageProps } from './Stage'
 export { BUILTIN_EFFECTS } from './shaders.ts'
 export type { VisualizerHost } from './host.ts'
