@@ -3,10 +3,13 @@
 What changed in WittyVisualizer, newest first. What changed before it had a repository of its own is in the
 [WittyMediaServer changelog](https://github.com/wittywilla/WittyMediaServer/blob/master/CHANGELOG.md).
 
-## Unreleased
+## 0.4.1
 
-- **Module API 5 (0.4.0):** carries `integration.json` (web host API 5, SDUI catalogue revision 8), and its bundle exports `register(host)`, which claims nothing yet: the audio player's visualizer place has no hook in WittyModule 0.5.2, so the server still draws `VisualizerStage`. The list of effects every app shows is this module's settings page; the server's catalogue no longer carries `music.visualizer`'s presets and controls.
-- Built with WittyModule 0.5.2 and its web builder; the module's own copy of `build-bundle.mjs` is gone, and the SDUI kit in `sdui/kit/` is WittyModule 0.5.2's (catalogue revision 8).
+- The first release on module API 5. The tag v0.4.0 was made before these build changes and was never published.
+
+
+- **Module API 5 (0.4.0):** carries `integration.json` (web host API 5, SDUI catalogue revision 8), and its bundle exports `register(host)`, which claims nothing yet: the audio player's visualizer place has no hook in WittyModule 0.5.4, so the server still draws `VisualizerStage`. The list of effects every app shows is this module's settings page; the server's catalogue no longer carries `music.visualizer`'s presets and controls.
+- Built on WittyModule 0.5.4 and module API 5, with its web builder; the module's own copy of `build-bundle.mjs` is gone, and the SDUI kit in `sdui/kit/` and the workflows are WittyModule 0.5.4's.
 
 - **Speed and colour.** A speed for how fast the effects move (50% to 200%), and a colour choice: each effect's own colour families, as before, or the theme's accent. Every effect takes both. In Settings, Modules and saved with the rest.
 - **Settings in every app's Settings, under Modules** (`sdui.json`, each profile's own): the effect, from all 18; picking at random; auto-change; only favourites; calm mode, with the flashing notice; intensity, sensitivity, quality and the frame rate. The visualizer reads what those rows save (`normalizeSettings` takes their strings and percentages) and `moduleSettingValues` gives an app what to save when a choice is made in the visualizer itself.
