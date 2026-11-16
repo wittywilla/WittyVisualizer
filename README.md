@@ -2,6 +2,8 @@
 
 Light shows that follow your music, full screen: bars, scopes, plasma, tunnels, starfields, feedback and fire. It appears in WittyMediaServer's audio player and in WittyMediaPlayer, and you need it only if you want the pictures.
 
+It's a module of [WittyMediaServer](https://github.com/wittywilla/WittyMediaServer) ([wittymediaserver.com](https://wittymediaserver.com)), on module API 5, with a desktop half (`qt/`) built into [WittyMediaPlayer](https://github.com/wittywilla/WittyMediaPlayer).
+
 <!-- pictures -->
 
 ![A light show behind the music player](docs/images/music-visualizer.webp)
@@ -77,7 +79,7 @@ How to use it is in **Help** inside WittyMediaServer: see Music, audiobooks and 
 
 ## How to get it
 
-An admin adds it from the module store inside WittyMediaServer: **Settings → Modules**, then **Browse the store**, then **Add** beside WittyVisualizer. That needs WittyMediaServer 0.6.0-alpha or later, and it works with nothing older. The range this version fits is in `module.json`: 0.6.0-alpha through 0.6.x.
+An admin adds it from the module store inside WittyMediaServer: **Settings → Modules**, then **Browse the store**, then **Add** beside WittyVisualizer. The range this version fits is in `module.json`: WittyMediaServer 0.8.0-alpha through 0.8.x, module API 5. The server takes API 5 modules only, so older servers can't use this version. How modules work on the server is in its [docs/MODULES.md](https://github.com/wittywilla/WittyMediaServer/blob/master/docs/MODULES.md).
 
 WittyMediaPlayer builds it in, so there's nothing to add there.
 
@@ -85,7 +87,7 @@ WittyMediaPlayer builds it in, so there's nothing to add there.
 
 - A device with WebGL 2 for the full effects. A plain canvas stands in without it.
 - React 18 or newer, which the app provides.
-- For the desktop half: Qt 6, including its GuiPrivate and ShaderTools parts.
+- For the desktop half: Qt 6.7 or later, including its GuiPrivate and ShaderTools parts.
 
 ## Platforms
 
@@ -93,14 +95,14 @@ It's one browser bundle for every system the server runs on, and it runs on whic
 
 In a browser, it listens to a copy of the sound where it can. Firefox's copy mutes the player and Safari has none, so there the player goes through an audio context, for a stream on the page's own address only. A stream from another address gets a gentle pattern, and it says so.
 
-The desktop half (`qt/`) runs inside WittyMediaPlayer, which is built for Windows only.
+The desktop half (`qt/`) runs inside WittyMediaPlayer, which has a Windows package. Its Linux AppImage is written but hasn't been built or run yet.
 
 ## Building and testing
 
-You need Node.js 22, as CI uses, and Go for the manifest check. In a worktree, first run the copy of `dev-modules.mjs` kept above the repositories (`node D:/projects/dev-modules.mjs` on the development machine). It writes only links that git ignores, so the checkout builds against the repositories beside it.
+You need Node.js 22, as CI uses, and Go for the manifest check. In a worktree, first run WittyMediaServer's `scripts/dev-modules.mjs` (or the copy its `--root` option keeps in the folder above the repositories). It writes only links that git ignores, so the checkout builds against the repositories beside it.
 
 ```bash
-npm install
+npm ci
 ```
 
 ```bash
@@ -110,7 +112,7 @@ npm run build:bundle
 That builds with WittyModule's one web builder (`kit/web/build-bundle.mjs`, from a WittyModule checkout beside this one, or `WITTYMODULE=<checkout>`), and makes one script and one stylesheet, as a server installs them. To check the manifest:
 
 ```bash
-go run github.com/wittywilla/wittymodule/cmd/wittymodule check .
+go run github.com/wittywilla/wittymodule/cmd/wittymodule@v0.5.4 check .
 ```
 
 ```bash
@@ -144,14 +146,9 @@ format.ts                        reads effect files; refuses unsafe ones someone
 
 To use it in another app, see [Embedding](wiki/Embedding.md) and the rest of [wiki/](wiki/Home.md).
 
-## Licence
-
-GNU Affero General Public License v3.0 (or later): see [LICENSE](LICENSE) and [NOTICE](NOTICE). If you redistribute it or build on it, please keep the NOTICE attribution. Everything here was written for this project: nothing comes from any other program's effects, presets, names or code.
-
-
 ## Module API 5
 
-WittyVisualizer 0.4.0 is built for module API 5 and carries `integration.json`. It asks for web host API 5 and SDUI catalogue revision 8, and claims no routes, Settings sections or other hooks: WittyModule 0.5.2 has no hook for the audio player's visualizer place, so the server draws the bundle's `VisualizerStage` and `currentSession` there. Its `register(host)` export returns nothing yet. It has no service and keeps no data: each person's choices are its settings, saved by the server.
+Since 0.4.0, WittyVisualizer is built for module API 5 and carries `integration.json`. It asks for web host API 5 and SDUI catalogue revision 8, and claims no routes, Settings sections or other hooks: WittyModule 0.5.4 has no hook for the audio player's visualizer place, so the server draws the bundle's `VisualizerStage` and `currentSession` there. Its `register(host)` export returns nothing yet. It has no service and keeps no data: each person's choices are its settings, saved by the server.
 
 ## In every app: its server-driven UI
 
@@ -161,11 +158,20 @@ It carries its own `sdui.json`: its theme scope, and **Settings, Visualizer** (e
 
 The file is checked with `wittymodule check` and described in WittyMediaServer's [docs/SDUI-MODULES.md](https://github.com/wittywilla/WittyMediaServer/blob/master/docs/SDUI-MODULES.md).
 
+## Licence
+
+GNU Affero General Public License v3.0 (or later): see [LICENSE](LICENSE) and [NOTICE](NOTICE). If you redistribute it or build on it, please keep the NOTICE attribution. Everything here was written for this project: nothing comes from any other program's effects, presets, names or code.
+
+WittyVisualizer is part of the WittyMediaServer project: [server repository](https://github.com/wittywilla/WittyMediaServer), [wittymediaserver.com](https://wittymediaserver.com).
+
 ## Legal
 
 WittyVisualizer is an independent open-source project. It isn't associated with, sponsored by or
 endorsed by any maker of other media players or visualizers. This can show flashing lights and
-fast-changing patterns, which may affect people with photosensitive conditions. Any third-party names
+fast-changing patterns, which may affect people with photosensitive conditions. Calm mode and the
+flash guard (see [Safety](#safety)) lower the risk but can't make moving light safe for everyone, and
+they haven't been assessed by a clinician. If flashing light affects you or anyone watching, don't
+turn it on. Any third-party names
 here only describe what it works with, and belong to their owners. It's provided “as is”, with no
 warranty; see [LICENSE](LICENSE). Local law applies to how you use it. This isn't legal advice.
 

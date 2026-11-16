@@ -6,4 +6,4 @@ Music visualizations that run from one set of shader files in a web app and a Qt
 - [Writing effects](Writing-effects.md): the file format, the helpers, and what's allowed
 - [Embedding](Embedding.md): putting it into an app, on the web or in Qt
 
-The [README](../README.md) has the design and the reasons for it.
+The [README](../README.md) has what it does, how the flash guard works, how it's built, and where each part lives.

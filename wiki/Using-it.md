@@ -21,8 +21,8 @@ desktop app, the arrows change the effect while the picture has the focus or it'
 seek as usual.
 
 **Settings** (the gear): how often the effect changes, random order, favourites only, how strongly it reacts, how easily it
-hears the music, calm mode, resolution, and showing the frame rate. They follow you between devices on a server, as your other
-interface choices do. On the desktop they stay on that computer.
+hears the music, calm mode, resolution, and showing the frame rate. On a server they're your profile's own, so they follow you between
+devices, and every app also has them in **Settings**, under **Modules**. On the desktop they stay on that computer.
 
 **If it stutters.** Leave resolution on Automatic and it finds its own level. If that's not enough, choose a lower one
 yourself. On a device with no graphics acceleration it starts low, at 30 frames a second.
