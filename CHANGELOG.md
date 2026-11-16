@@ -3,6 +3,10 @@
 What changed in WittyVisualizer, newest first. What changed before it had a repository of its own is in the
 [WittyMediaServer changelog](https://github.com/wittywilla/WittyMediaServer/blob/master/CHANGELOG.md).
 
+## 0.4.2
+
+- The README's pictures are retaken from WittyMediaServer 0.8.0-alpha's full-screen player, with open music only.
+
 ## 0.4.1
 
 - The first release on module API 5. The tag v0.4.0 was made before these build changes and was never published.
