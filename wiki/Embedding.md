@@ -12,11 +12,12 @@ const [viz, setViz] = useState<'off' | 'panel' | 'full'>('off')
 )}
 ```
 
-That's all a player needs, WittyCD's included. Put a parent of the size you want around it for `panel`. `V` and the button are the
+`web/src/audio/visualizer.tsx` loads this module's bundle once an admin has added WittyVisualizer from the store, and draws nothing
+without it. That's all a player needs, WittyCD's included. Put a parent of the size you want around it for `panel`. `V` and the button are the
 player's own: start it only from a press. Settings, the notice, the keys and full screen are taken care of, and it stays out of the
 main script until the first time someone opens it. Only one is on the page at a time: a second place takes over the canvas.
 
-A player with its own controls can read `currentSession()` once one is showing: its `effects`, `settings`, `select(id)`, `next()`, `update(patch)` and `subscribe(fn)`. `BUILTIN_EFFECTS` lists the effects before anything has started. The full-screen player uses these to show effects behind its artwork, with this plugin's bar hidden.
+A player with its own controls can read `currentSession()` once one is showing: its `effects`, `settings`, `select(id)`, `next()`, `update(patch)` and `subscribe(fn)`. `BUILTIN_EFFECTS` lists the effects before anything has started. The full-screen player uses these to show effects behind its artwork, with the visualizer's own bar hidden.
 
 `media` may return a different element each time it opens. If that element plays from another address, it follows a pattern, and
 the music is left alone.
