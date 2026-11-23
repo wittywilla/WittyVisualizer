@@ -18,6 +18,10 @@ It's a module of [WittyMediaServer](https://github.com/wittywilla/WittyMediaServ
 
 <sub>A third, with [Collide](https://archive.org/details/SRS08807), Aryll Fae, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).</sub>
 
+![Karaoke words over a soft aurora](docs/images/karaoke.webp)
+
+<sub>Behind karaoke's words: Northern Veil. "Take Me Out to the Ball Game", 1908, public domain.</sub>
+
 <!-- /pictures -->
 
 ## What it does
