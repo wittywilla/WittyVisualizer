@@ -86,3 +86,5 @@ html.using-controller .wv-icon:focus, html.using-controller .wv-select:focus { o
 @media (forced-colors: active) {
   .wv-icon { border: 1px solid ButtonText; }
 }
+/* A television shows no computer keys (TV-MODE.md): the keys still work. */
+html.tv-mode .wv-keys { display: none !important; }
