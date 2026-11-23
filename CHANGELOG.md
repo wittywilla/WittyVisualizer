@@ -3,6 +3,14 @@
 What changed in WittyVisualizer, newest first. What changed before it had a repository of its own is in the
 [WittyMediaServer changelog](https://github.com/wittywilla/WittyMediaServer/blob/master/CHANGELOG.md).
 
+## 0.4.3
+
+- **No computer keys on a television.** In TV mode the list of keyboard keys under the visualizer's settings is gone. The keys still work on a computer, where the list stays.
+
+## Developer notes for 0.4.3
+
+- `html.tv-mode .wv-keys` is hidden (docs/TV-MODE.md: a television never shows a computer's keys).
+
 ## 0.4.2
 
 - The README's pictures are retaken from WittyMediaServer 0.8.0-alpha's full-screen player, with open music only.
